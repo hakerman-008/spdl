@@ -3,66 +3,32 @@ const axios = require('axios');
 
 const app = express();
 
-
 app.get('/spotify', async (req, res) => {
+    const { url } = req.query;
+
+    if (!url) {
+        return res.status(400).json({ error: 'Spotify URL is required' });
+    }
+
     try {
-        const spotifyUrl = req.query.id;
-        const userQuery = req.query.query;
+        // Use the external API to fetch Spotify track details
+        const response = await axios.get(`https://api.ryzendesu.vip/api/downloader/spotify`, {
+            params: { url },
+        });
 
-        if (spotifyUrl) {
-          
-            const options = {
-                method: 'GET',
-                url: 'https://spotify-downloader6.p.rapidapi.com/spotify',
-                params: { spotifyUrl },
-                headers: {
-                    'X-RapidAPI-Key': 'b38444b5b7mshc6ce6bcd5c9e446p154fa1jsn7bbcfb025b3b',
-                    'X-RapidAPI-Host': 'spotify-downloader6.p.rapidapi.com'
-                }
-            };
+        const data = response.data;
 
-            const response = await axios.request(options);
-            const { download_link } = response.data;
-
-            return res.json({ download_link });
-        } else if (userQuery) {
-           
-            const options = {
-                method: 'GET',
-                url: 'https://spotify81.p.rapidapi.com/search',
-                params: {
-                    q: userQuery,
-                    type: 'tracks',
-                    offset: '0',
-                    limit: '10',
-                    numberOfTopResults: '5'
-                },
-                headers: {
-                    'X-RapidAPI-Key': 'b38444b5b7mshc6ce6bcd5c9e446p154fa1jsn7bbcfb025b3b',
-                    'X-RapidAPI-Host': 'spotify81.p.rapidapi.com'
-                }
-            };
-
-            const response = await axios.request(options);
-            const { tracks } = response.data;
-
-          
-            const trackIDs = tracks.map(track => {
-                const trackID = track.uri.split(':')[2];
-                return `https://open.spotify.com/track/${trackID}`;
-            });
-
-            return res.json({ trackIDs });
+        // Check if the API returned a successful response
+        if (data.success) {
+            return res.json({ download_link: data.link });
         } else {
-           
-            return res.status(400).json({ error: 'Spotify URL or query is required' });
+            return res.status(404).json({ error: 'Failed to fetch download link from the API' });
         }
     } catch (error) {
-        console.error('Error:', error);
+        console.error('Error fetching from Spotify downloader API:', error.message);
         return res.status(500).json({ error: 'Internal server error' });
     }
 });
-
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
