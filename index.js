@@ -4,16 +4,16 @@ const axios = require('axios');
 const app = express();
 
 app.get('/spotify', async (req, res) => {
-    const { url } = req.query;
+    const { id } = req.query;
 
-    if (!url) {
-        return res.status(400).json({ error: 'Spotify URL is required' });
+    if (!id) {
+        return res.status(400).json({ error: 'Spotify ID is required' });
     }
 
     try {
-        // Use the external API to fetch Spotify track details
+        // Use the external API to fetch Spotify track details using 'id'
         const response = await axios.get(`https://restapi.apibotwa.biz.id/api/spotify`, {
-            params: { url },
+            params: { url: id },
         });
 
         const data = response.data;
