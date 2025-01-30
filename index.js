@@ -12,15 +12,15 @@ app.get('/spotify', async (req, res) => {
 
     try {
         // Use the external API to fetch Spotify track details using 'id'
-        const response = await axios.get(`https://restapi.apibotwa.biz.id/api/spotify`, {
+        const response = await axios.get(`https://api.vreden.web.id/api/spotify`, {
             params: { url: id },
         });
 
         const data = response.data;
 
         // Check if the API returned a successful response
-        if (data.status === 200 && data.data.response) {
-            return res.json({ download_link: data.data.response });
+        if (data.status === 200 && data.result.status) {
+            return res.json({ download_link: data.result.music });
         } else {
             return res.status(404).json({ error: 'Failed to fetch download link from the API' });
         }
