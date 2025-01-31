@@ -3,7 +3,7 @@ const axios = require('axios');
 
 const app = express();
 
-app.get('/spotify', async (req, res) => {
+app.get('/spotify', async (req, res) => { 
     const { id } = req.query;
 
     if (!id) {
